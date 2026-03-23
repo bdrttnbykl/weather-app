@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -8,6 +9,11 @@ const API_KEY = process.env.API_KEY;
 const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 app.use(cors());
+app.use(express.static(__dirname));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 function getQueryParams(req) {
   const city = req.query.city;
@@ -25,9 +31,9 @@ function getQueryParams(req) {
   return null;
 }
 
-async function fetchOpenWeather(path, query) {
+async function fetchOpenWeather(pathName, query) {
   const separator = query ? "&" : "";
-  const url = `${OPENWEATHER_BASE_URL}/${path}?${query}${separator}appid=${API_KEY}&units=metric&lang=tr`;
+  const url = `${OPENWEATHER_BASE_URL}/${pathName}?${query}${separator}appid=${API_KEY}&units=metric&lang=tr`;
   const response = await fetch(url);
   const data = await response.json();
 
@@ -48,7 +54,8 @@ app.get("/api/weather", async (req, res) => {
   try {
     const { response, data } = await fetchOpenWeather("weather", query);
     return res.status(response.status).json(data);
-  } catch {
+  } catch (error) {
+    console.error("Weather endpoint hatasi:", error);
     return res.status(500).json({ message: "Sunucu hatasi" });
   }
 });
@@ -67,7 +74,8 @@ app.get("/api/forecast", async (req, res) => {
   try {
     const { response, data } = await fetchOpenWeather("forecast", query);
     return res.status(response.status).json(data);
-  } catch {
+  } catch (error) {
+    console.error("Forecast endpoint hatasi:", error);
     return res.status(500).json({ message: "Sunucu hatasi" });
   }
 });
@@ -88,11 +96,12 @@ app.get("/api/air", async (req, res) => {
     const query = `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
     const { response, data } = await fetchOpenWeather("air_pollution", query);
     return res.status(response.status).json(data);
-  } catch {
+  } catch (error) {
+    console.error("Air endpoint hatasi:", error);
     return res.status(500).json({ message: "Sunucu hatasi" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Server calisiyor: http://localhost:${PORT}`);
+  console.log(`Server calisiyor, port: ${PORT}`);
 });

@@ -376,10 +376,10 @@ async function fetchWeatherBundle({ city, lat, lon }) {
     ? `city=${encodeURIComponent(city)}`
     : `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
 
-  const weatherData = await fetchJson(`http://localhost:3000/api/weather?${weatherQuery}`);
-  const forecastData = await fetchJson(`http://localhost:3000/api/forecast?${weatherQuery}`);
+  const weatherData = await fetchJson(`/api/weather?${weatherQuery}`);
+  const forecastData = await fetchJson(`/api/forecast?${weatherQuery}`);
   const airData = await fetchJson(
-    `http://localhost:3000/api/air?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}`
+    `/api/air?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}`
   );
 
   return { weatherData, forecastData, airData };
