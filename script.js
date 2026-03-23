@@ -1,4 +1,3 @@
-const apiKey = "94e86089e899a896b3fe865d4757afbc";
 const appStorageKeys = {
   lastCity: "lastCity",
   favorites: "favoriteCities",
@@ -373,17 +372,14 @@ async function fetchJson(url) {
 }
 
 async function fetchWeatherBundle({ city, lat, lon }) {
-  const baseWeatherUrl = "https://api.openweathermap.org/data/2.5/weather";
-  const baseForecastUrl = "https://api.openweathermap.org/data/2.5/forecast";
-  const baseAirUrl = "https://api.openweathermap.org/data/2.5/air_pollution";
-  const query = city
-    ? `q=${encodeURIComponent(city)}`
-    : `lat=${lat}&lon=${lon}`;
+  const weatherQuery = city
+    ? `city=${encodeURIComponent(city)}`
+    : `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
 
-  const weatherData = await fetchJson(`${baseWeatherUrl}?${query}&appid=${apiKey}&units=metric&lang=tr`);
-  const forecastData = await fetchJson(`${baseForecastUrl}?${query}&appid=${apiKey}&units=metric&lang=tr`);
+  const weatherData = await fetchJson(`http://localhost:3000/api/weather?${weatherQuery}`);
+  const forecastData = await fetchJson(`http://localhost:3000/api/forecast?${weatherQuery}`);
   const airData = await fetchJson(
-    `${baseAirUrl}?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&appid=${apiKey}`
+    `http://localhost:3000/api/air?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}`
   );
 
   return { weatherData, forecastData, airData };
